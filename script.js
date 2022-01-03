@@ -28,6 +28,18 @@ var gameover = false;
 var firstSpecialFruit = true;
 var specialFruitEaten = false;
 
+const colorsArray = ["./apple_rainbow_1.png", "./apple_rainbow_2.png", "./apple_rainbow_3.png", "./apple_rainbow_4.png", "./apple_rainbow_5.png", "./apple_rainbow_6.png"];
+const snakeArray = ["./snake_down.png", "./snake_up.png", "./snake_left.png", "./snake_right.png", "./snake_body.png"];
+
+const SNAKE_HEAD_DOWN = 0;
+const SNAKE_HEAD_UP = 1;
+const SNAKE_HEAD_LEFT = 2;
+const SNAKE_HEAD_RIGHT = 3;
+const SNAKE_BODY = 3;
+
+var arrayImagesSnake = [];
+var arrayImagesSpecialFruit = [];
+
 window.onload = function() {
 
     scoreHTML = document.getElementById("score");
@@ -43,8 +55,20 @@ window.onload = function() {
     
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
-    ctx.canvas.width = 1000;
-    ctx.canvas.height = 800;
+    ctx.canvas.width = 1020;
+    ctx.canvas.height = 620;
+
+    for (let i = 0; i < 6; i ++) {
+        let img = new Image();
+        img.src = colorsArray[i];
+        arrayImagesSpecialFruit.push(img);
+    }
+
+    for (let i = 0; i < 5; i ++) {
+        let img = new Image();
+        img.src = snakeArray[i];
+        arrayImagesSnake.push(img);
+    }
 
     createRandomFruit();
     loop();
@@ -287,9 +311,18 @@ function moveSnake() {
 }
 
 function drawSnake() {
-    ctx.fillStyle = snake[0].color;
     for (let i = 0 ; i < snake.length; i ++) {
-        ctx.fillRect(snake[i].x, snake[i].y, snake[0].width, snake[0].height);    
+        if (i > 0) {
+            ctx.drawImage(arrayImagesSnake[4], snake[i].x, snake[i].y);
+        } else if (i === 0 && snake[0].dir === "right") {
+            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_RIGHT], snake[i].x, snake[i].y);
+        } else if (i === 0 && snake[0].dir === "left") {
+            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_LEFT], snake[i].x, snake[i].y);
+        } else if (i === 0 && snake[0].dir === "top") {
+            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_UP], snake[i].x, snake[i].y);
+        } else if (i === 0 && snake[0].dir === "bottom") {
+            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_DOWN], snake[i].x, snake[i].y);
+        }
     }
 }
 
@@ -298,8 +331,13 @@ function clearSnake() {
 }
 
 function drawFruit() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(fruit.x, fruit.y, 20, 20);    
+
+    var img = new Image();
+    img.src = "./apple.png";
+
+    img.onload = () => {
+        ctx.drawImage(img, fruit.x, fruit.y);    
+    };
 }
 
 function clearFruit() {
@@ -308,13 +346,11 @@ function clearFruit() {
 
 function drawSpecialFruit() {
 
-    let colorsArray = ["yellow", "green", "orange", "red", "pink", "purple"];
     var i = 0;
 
     setInterval(function() {
-        ctx.fillStyle = colorsArray[i];
         if (specialFruit.x !== -20 && specialFruit.y !== -20) {
-            ctx.fillRect(specialFruit.x, specialFruit.y, 20, 20);    
+            ctx.drawImage(arrayImagesSpecialFruit[i], specialFruit.x, specialFruit.y);    
         }
         i++;
         if (i === 6) {
