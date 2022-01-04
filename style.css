@@ -15,6 +15,7 @@ body {
 #canvas {
     border: 1px solid #121212; 
     background-color: #e0a83e;
+    margin: 0;
 }
 
 h3 {

@@ -29,13 +29,17 @@ var firstSpecialFruit = true;
 var specialFruitEaten = false;
 
 const colorsArray = ["./apple_rainbow_1.png", "./apple_rainbow_2.png", "./apple_rainbow_3.png", "./apple_rainbow_4.png", "./apple_rainbow_5.png", "./apple_rainbow_6.png"];
-const snakeArray = ["./snake_down.png", "./snake_up.png", "./snake_left.png", "./snake_right.png", "./snake_body.png"];
+const snakeArray = ["./snake_down.png", "./snake_up.png", "./snake_left.png", "./snake_right.png", "./snake_body.png", "./snake_tail_down.png", "./snake_tail_right.png", "./snake_tail_up.png", "./snake_tail_left.png"];
 
 const SNAKE_HEAD_DOWN = 0;
 const SNAKE_HEAD_UP = 1;
 const SNAKE_HEAD_LEFT = 2;
 const SNAKE_HEAD_RIGHT = 3;
-const SNAKE_BODY = 3;
+const SNAKE_BODY = 4;
+const SNAKE_TAIL_DOWN = 5;
+const SNAKE_TAIL_RIGHT = 6;
+const SNAKE_TAIL_UP = 7;
+const SNAKE_TAIL_LEFT = 8;
 
 var arrayImagesSnake = [];
 var arrayImagesSpecialFruit = [];
@@ -44,19 +48,11 @@ window.onload = function() {
 
     scoreHTML = document.getElementById("score");
     scoreHTML.innerHTML = "Score: " + score;
-    snake.push({
-        width: 20,
-        height: 20,
-        x: 20,
-        y: 20,
-        color: "#1c701c",
-        dir: "right"
-    });
     
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
-    ctx.canvas.width = 1020;
-    ctx.canvas.height = 620;
+    ctx.canvas.width = window.visualViewport.width - (window.visualViewport.width % 20) - 100;
+    ctx.canvas.height = window.visualViewport.height - (window.visualViewport.height % 20) - 80;
 
     for (let i = 0; i < 6; i ++) {
         let img = new Image();
@@ -64,11 +60,13 @@ window.onload = function() {
         arrayImagesSpecialFruit.push(img);
     }
 
-    for (let i = 0; i < 5; i ++) {
+    for (let i = 0; i < 9; i ++) {
         let img = new Image();
         img.src = snakeArray[i];
         arrayImagesSnake.push(img);
     }
+
+    snake.push({width: 20, height: 20, x: 20, y: 20, dir: "right", img: arrayImagesSnake[SNAKE_HEAD_RIGHT]});
 
     createRandomFruit();
     loop();
@@ -80,21 +78,25 @@ window.onload = function() {
         if (e.keyCode === 37) {
             if (snake[0].dir !== "right") {
                 snake[0].dir = "left";
+                snake[0].img = arrayImagesSnake[SNAKE_HEAD_LEFT];
                 moveSnake();
             }
         } else if (e.keyCode === 38) {
             if (snake[0].dir !== "bottom") {
                 snake[0].dir = "top";
+                snake[0].img = arrayImagesSnake[SNAKE_HEAD_UP];
                 moveSnake();
             }
         } else if (e.keyCode === 39) {
             if (snake[0].dir !== "left") {
                 snake[0].dir = "right";
+                snake[0].img = arrayImagesSnake[SNAKE_HEAD_RIGHT];
                 moveSnake();
             }
         } else if (e.keyCode === 40) {
             if (snake[0].dir !== "top") {
                 snake[0].dir = "bottom";
+                snake[0].img = arrayImagesSnake[SNAKE_HEAD_DOWN];
                 moveSnake();
             }
         }
@@ -130,7 +132,9 @@ function fruitCollision() {
         scoreHTML.innerHTML = "Score: " + score;
         snake.push({
             x: snake[snake.length - 1].x,
-            y: snake[snake.length - 1].y
+            y: snake[snake.length - 1].y,
+            dir: snake[snake.length - 1].dir,
+            img: snake[snake.length - 1].img
         });
         
         if (score % 10 === 0 && speed > 50) {
@@ -146,15 +150,21 @@ function specialFruitCollision() {
         scoreHTML.innerHTML = "Score: " + score;
         snake.push({
             x: snake[snake.length - 1].x,
-            y: snake[snake.length - 1].y
+            y: snake[snake.length - 1].y,
+            dir: snake[snake.length - 1].dir,
+            img: snake[snake.length - 1].img
         },
         {
             x: snake[snake.length - 1].x,
-            y: snake[snake.length - 1].y
+            y: snake[snake.length - 1].y,
+            dir: snake[snake.length - 1].dir,
+            img: snake[snake.length - 1].img
         },
         {
             x: snake[snake.length - 1].x,
-            y: snake[snake.length - 1].y
+            y: snake[snake.length - 1].y,
+            dir: snake[snake.length - 1].dir,
+            img: snake[snake.length - 1].img
         });
 
         clearSpecialFruit();
@@ -254,6 +264,7 @@ function createRandomSpecialFruit() {
 
 function moveSnake() {
 
+    console.log(fruit.x + ", " + fruit.y);
     clearSnake();
     fruitCollision();
     specialFruitCollision();
@@ -265,6 +276,7 @@ function moveSnake() {
                 for (let i = snake.length - 1 ; i >= 1 ; i --) {
                     snake[i].x = snake[i-1].x;
                     snake[i].y = snake[i-1].y;
+                    snake[i].dir = snake[i-1].dir;
                 }
             }
             snake[0].x -= 20;
@@ -277,6 +289,7 @@ function moveSnake() {
                 for (let i = snake.length - 1 ; i >= 1 ; i --) {
                     snake[i].x = snake[i-1].x;
                     snake[i].y = snake[i-1].y;
+                    snake[i].dir = snake[i-1].dir;
                 }
             }
             snake[0].y -= 20;
@@ -289,6 +302,7 @@ function moveSnake() {
                 for (let i = snake.length - 1 ; i >= 1 ; i --) {
                     snake[i].x = snake[i-1].x;
                     snake[i].y = snake[i-1].y;
+                    snake[i].dir = snake[i-1].dir;
                 }
             }
             snake[0].x += 20;
@@ -301,28 +315,40 @@ function moveSnake() {
                 for (let i = snake.length - 1 ; i >= 1 ; i --) {
                     snake[i].x = snake[i-1].x;
                     snake[i].y = snake[i-1].y;
+                    snake[i].dir = snake[i-1].dir;
                 }
             }
             snake[0].y += 20;
         }
     }
+    if (1 < snake.length) {
+        for (let i = snake.length - 1 ; i >= 1 ; i --) {
+            
+            if (i < snake.length - 1) {
+                snake[i].img = arrayImagesSnake[SNAKE_BODY];
+            } else if (i === snake.length - 1 && snake[i].dir === "right") {
+                snake[i].img = arrayImagesSnake[SNAKE_TAIL_RIGHT];
+            } else if (i === snake.length - 1 && snake[i].dir === "left") {
+                snake[i].img = arrayImagesSnake[SNAKE_TAIL_LEFT];
+            } else if (i === snake.length - 1 && snake[i].dir === "top") {
+                snake[i].img = arrayImagesSnake[SNAKE_TAIL_UP];
+            } else if (i === snake.length - 1 && snake[i].dir === "bottom") {
+                snake[i].img = arrayImagesSnake[SNAKE_TAIL_DOWN];
+            }
+        }
+    }
+
     snakeCollision();
     drawSnake();
+    drawFruit();
 }
 
 function drawSnake() {
     for (let i = 0 ; i < snake.length; i ++) {
-        if (i > 0) {
-            ctx.drawImage(arrayImagesSnake[4], snake[i].x, snake[i].y);
-        } else if (i === 0 && snake[0].dir === "right") {
-            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_RIGHT], snake[i].x, snake[i].y);
-        } else if (i === 0 && snake[0].dir === "left") {
-            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_LEFT], snake[i].x, snake[i].y);
-        } else if (i === 0 && snake[0].dir === "top") {
-            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_UP], snake[i].x, snake[i].y);
-        } else if (i === 0 && snake[0].dir === "bottom") {
-            ctx.drawImage(arrayImagesSnake[SNAKE_HEAD_DOWN], snake[i].x, snake[i].y);
+        if (i === snake.length - 1) {
+            clearSnake();
         }
+        ctx.drawImage(snake[i].img, snake[i].x, snake[i].y);
     }
 }
 
@@ -356,7 +382,7 @@ function drawSpecialFruit() {
         if (i === 6) {
             i = 0;
         }
-    }, 200);
+    }, 150);
 }
 
 function clearSpecialFruit() {
