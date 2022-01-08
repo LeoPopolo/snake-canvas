@@ -28,8 +28,8 @@ var gameover = false;
 var firstSpecialFruit = true;
 var specialFruitEaten = false;
 
-const colorsArray = ["./apple_rainbow_1.png", "./apple_rainbow_2.png", "./apple_rainbow_3.png", "./apple_rainbow_4.png", "./apple_rainbow_5.png", "./apple_rainbow_6.png"];
-const snakeArray = ["./snake_down.png", "./snake_up.png", "./snake_left.png", "./snake_right.png", "./snake_body.png", "./snake_tail_down.png", "./snake_tail_right.png", "./snake_tail_up.png", "./snake_tail_left.png"];
+const colorsArray = ["./sprites/apple_rainbow_1.png", "./sprites/apple_rainbow_2.png", "./sprites/apple_rainbow_3.png", "./sprites/apple_rainbow_4.png", "./sprites/apple_rainbow_5.png", "./sprites/apple_rainbow_6.png"];
+const snakeArray = ["./sprites/snake_down.png", "./sprites/snake_up.png", "./sprites/snake_left.png", "./sprites/snake_right.png", "./sprites/snake_body.png", "./sprites/snake_tail_down.png", "./sprites/snake_tail_right.png", "./sprites/snake_tail_up.png", "./sprites/snake_tail_left.png"];
 
 const SNAKE_HEAD_DOWN = 0;
 const SNAKE_HEAD_UP = 1;
@@ -257,70 +257,72 @@ function createRandomSpecialFruit() {
             specialFruit.x = -20;
             specialFruit.y = -20;
         }
-    }, 5000);
+    }, 8000);
 
     drawSpecialFruit();
 }
 
 function moveSnake() {
-
-    console.log(fruit.x + ", " + fruit.y);
+    
     clearSnake();
     fruitCollision();
     specialFruitCollision();
     if (snake[0].dir === "left" ) {
-        if (snake[0].x === 0) {
-            gameOver();
-        } else {
-            if (1 < snake.length) {
-                for (let i = snake.length - 1 ; i >= 1 ; i --) {
-                    snake[i].x = snake[i-1].x;
-                    snake[i].y = snake[i-1].y;
-                    snake[i].dir = snake[i-1].dir;
-                }
+         
+        if (1 < snake.length) {
+            for (let i = snake.length - 1 ; i >= 1 ; i --) {
+                snake[i].x = snake[i-1].x;
+                snake[i].y = snake[i-1].y;
+                snake[i].dir = snake[i-1].dir;
             }
-            snake[0].x -= 20;
         }
+        snake[0].x -= 20;
+        
     } else if (snake[0].dir === "top" ) {
-        if (snake[0].y === 0) {
-            gameOver();
-        } else {
-            if (1 < snake.length) {
-                for (let i = snake.length - 1 ; i >= 1 ; i --) {
-                    snake[i].x = snake[i-1].x;
-                    snake[i].y = snake[i-1].y;
-                    snake[i].dir = snake[i-1].dir;
-                }
+        
+        if (1 < snake.length) {
+            for (let i = snake.length - 1 ; i >= 1 ; i --) {
+                snake[i].x = snake[i-1].x;
+                snake[i].y = snake[i-1].y;
+                snake[i].dir = snake[i-1].dir;
             }
-            snake[0].y -= 20;
         }
+        snake[0].y -= 20;
+        
     } else if (snake[0].dir === "right" ) {
-        if (snake[0].x === canvas.width - 20) {
-            gameOver();
-        } else {
-            if (1 < snake.length) {
-                for (let i = snake.length - 1 ; i >= 1 ; i --) {
-                    snake[i].x = snake[i-1].x;
-                    snake[i].y = snake[i-1].y;
-                    snake[i].dir = snake[i-1].dir;
-                }
+        
+        if (1 < snake.length) {
+            for (let i = snake.length - 1 ; i >= 1 ; i --) {
+                snake[i].x = snake[i-1].x;
+                snake[i].y = snake[i-1].y;
+                snake[i].dir = snake[i-1].dir;
             }
-            snake[0].x += 20;
         }
+        snake[0].x += 20;
+        
     } else if (snake[0].dir === "bottom" ) {
-        if (snake[0].y === canvas.height - 20) {
-            gameOver();
-        } else {
-            if (1 < snake.length) {
-                for (let i = snake.length - 1 ; i >= 1 ; i --) {
-                    snake[i].x = snake[i-1].x;
-                    snake[i].y = snake[i-1].y;
-                    snake[i].dir = snake[i-1].dir;
-                }
+        
+        if (1 < snake.length) {
+            for (let i = snake.length - 1 ; i >= 1 ; i --) {
+                snake[i].x = snake[i-1].x;
+                snake[i].y = snake[i-1].y;
+                snake[i].dir = snake[i-1].dir;
             }
-            snake[0].y += 20;
         }
+        snake[0].y += 20;
+        
     }
+
+    if (snake[0].x <= -20) {
+        snake[0].x = canvas.width - 20;
+    } else if (snake[0].y <= -20) {
+        snake[0].y = canvas.height - 20;
+    } else if (snake[0].x >= canvas.width) {
+        snake[0].x = 0;
+    } else if (snake[0].y >= canvas.height) {
+        snake[0].y = 0;
+    }
+
     if (1 < snake.length) {
         for (let i = snake.length - 1 ; i >= 1 ; i --) {
             
@@ -344,22 +346,21 @@ function moveSnake() {
 }
 
 function drawSnake() {
-    for (let i = 0 ; i < snake.length; i ++) {
-        if (i === snake.length - 1) {
-            clearSnake();
-        }
+    for (let i = 0; i < snake.length; i++) {
         ctx.drawImage(snake[i].img, snake[i].x, snake[i].y);
     }
 }
 
 function clearSnake() {
-    ctx.clearRect(snake[snake.length - 1].x, snake[snake.length - 1].y, snake[0].width, snake[0].height);    
+    for (let i = 0; i < snake.length; i++) {
+        ctx.clearRect(snake[i].x, snake[i].y, snake[0].width, snake[0].height);       
+    }
 }
 
 function drawFruit() {
 
     var img = new Image();
-    img.src = "./apple.png";
+    img.src = "./sprites/apple.png";
 
     img.onload = () => {
         ctx.drawImage(img, fruit.x, fruit.y);    
